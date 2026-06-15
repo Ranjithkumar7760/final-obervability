@@ -1,0 +1,168 @@
+services:
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "5001:5001"
+    environment:
+      - SECRET_KEY=poc-secret-key-2024
+    networks:
+      - ecommerce-net
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "5002:5002"
+    environment:
+      - AUTH_SERVICE=http://auth-service:5001
+      - PAYMENT_SERVICE=http://payment-service:5003
+      - NOTIFICATION_SERVICE=http://notification-service:5004
+      - USER_SERVICE=http://user-service:5005
+    depends_on:
+      - auth-service
+    networks:
+      - ecommerce-net
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "5003:5003"
+    environment:
+      - AUTH_SERVICE=http://auth-service:5001
+      - ORDER_SERVICE=http://order-service:5002
+      - NOTIFICATION_SERVICE=http://notification-service:5004
+      - USER_SERVICE=http://user-service:5005
+    depends_on:
+      - auth-service
+    networks:
+      - ecommerce-net
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "5004:5004"
+    networks:
+      - ecommerce-net
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "5005:5005"
+    networks:
+      - ecommerce-net
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - auth-service
+      - order-service
+      - payment-service
+    networks:
+      - ecommerce-net
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - ecommerce-net
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./observability/otel-collector-config.yaml:/etc/otelcol/config.yaml
+    ports:
+      - "4319:4317"
+      - "4320:4318"
+      - "8889:8889"
+    depends_on:
+      - jaeger
+    networks:
+      - ecommerce-net
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - otel-collector
+    networks:
+      - ecommerce-net
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3010:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+      - ./observability/grafana/provisioning/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - ecommerce-net
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    container_name: cadvisor
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var:/var:ro
+      - /dev/disk/:/dev/disk:ro
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        if [ -d "/var/snap/docker/common/var-lib-docker" ] && [ "$$(ls -A /var/snap/docker/common/var-lib-docker 2>/dev/null)" ]; then
+          echo "Detected Snap Docker root directory. Running cAdvisor with snap path..."
+          exec /usr/bin/cadvisor --docker_root=/var/snap/docker/common/var-lib-docker "$$@"
+        else
+          echo "Detected standard Docker root directory. Running cAdvisor with standard path..."
+          exec /usr/bin/cadvisor --docker_root=/var/lib/docker "$$@"
+        fi
+    ports:
+      - "8080:8080"
+    networks:
+      - ecommerce-net
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro'
+    networks:
+      - ecommerce-net
+    restart: unless-stopped
+
+networks:
+  ecommerce-net:
+    driver: bridge
+
+volumes:
+  grafana-storage:
