@@ -43,7 +43,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(otel_traces_span_metrics_calls_total[1m])) by (service_name)",
+          "expr": "sum(rate(otel_traces_span_metrics_calls_total{service_name=~\".*-service\"}[1m])) by (service_name)",
           "legendFormat": "{{service_name}}",
           "range": true,
           "refId": "A"
@@ -98,7 +98,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(increase(otel_traces_span_metrics_calls_total[15m]))",
+          "expr": "sum(increase(otel_traces_span_metrics_calls_total{service_name=~\".*-service\"}[15m]))",
           "legendFormat": "Total Spans",
           "range": true,
           "refId": "A"
@@ -156,7 +156,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(otel_traces_span_metrics_calls_total[5m])) by (service_name)",
+          "expr": "sum(rate(otel_traces_span_metrics_calls_total{service_name=~\".*-service\"}[5m])) by (service_name)",
           "legendFormat": "{{service_name}}",
           "range": true,
           "refId": "A"

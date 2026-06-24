@@ -43,7 +43,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(otel_traces_span_metrics_calls_total[1m])) by (service_name)",
+          "expr": "sum(rate(otel_traces_span_metrics_calls_total{service_name=~\".*-service\"}[1m])) by (service_name)",
           "legendFormat": "{{service_name}}",
           "range": true,
           "refId": "A"
@@ -85,7 +85,7 @@
         "y": 0
       },
       "id": 2,
-      "title": "Service Response Latency Trends (ms)",
+      "title": "Service Response Latency (ms)",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -98,8 +98,8 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(otel_traces_span_metrics_duration_milliseconds_sum[1m])) by (service_name) / sum(rate(otel_traces_span_metrics_duration_milliseconds_count[1m])) by (service_name)",
-          "legendFormat": "{{service_name}}",
+          "expr": "sum(otel_traces_span_metrics_duration_milliseconds_sum{service_name=~\".*-service\"}) by (service_name) / sum(otel_traces_span_metrics_duration_milliseconds_count{service_name=~\".*-service\"}) by (service_name)",
+          "legendFormat": "{{service_name}} avg",
           "range": true,
           "refId": "A"
         },
@@ -109,8 +109,8 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(otel_traces_span_metrics_duration_milliseconds_sum[1m])) by (service_name) / sum(rate(otel_traces_span_metrics_duration_milliseconds_count[1m])) by (service_name)",
-          "legendFormat": "{{service_name}} (alt)",
+          "expr": "histogram_quantile(0.95, sum(otel_traces_span_metrics_duration_milliseconds_bucket{service_name=~\".*-service\"}) by (service_name, le))",
+          "legendFormat": "{{service_name}} p95",
           "range": true,
           "refId": "B"
         }

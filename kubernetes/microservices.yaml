@@ -27,6 +27,12 @@ spec:
           env:
             - name: SECRET_KEY
               value: "poc-secret-key-2024"
+            - name: ORDER_SERVICE_URL
+              value: "http://order-service:5002"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -63,14 +69,12 @@ spec:
           ports:
             - containerPort: 5002
           env:
-            - name: AUTH_SERVICE
-              value: "http://auth-service:5001"
-            - name: PAYMENT_SERVICE
+            - name: PAYMENT_SERVICE_URL
               value: "http://payment-service:5003"
-            - name: NOTIFICATION_SERVICE
-              value: "http://notification-service:5004"
-            - name: USER_SERVICE
-              value: "http://user-service:5005"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -107,14 +111,12 @@ spec:
           ports:
             - containerPort: 5003
           env:
-            - name: AUTH_SERVICE
-              value: "http://auth-service:5001"
-            - name: ORDER_SERVICE
-              value: "http://order-service:5002"
-            - name: NOTIFICATION_SERVICE
+            - name: NOTIFICATION_SERVICE_URL
               value: "http://notification-service:5004"
-            - name: USER_SERVICE
-              value: "http://user-service:5005"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -150,6 +152,13 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5004
+          env:
+            - name: USER_SERVICE_URL
+              value: "http://user-service:5005"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -185,6 +194,11 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5005
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
 ---
 apiVersion: v1
 kind: Service

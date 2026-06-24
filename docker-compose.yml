@@ -1,55 +1,86 @@
 services:
   auth-service:
-    build: ./auth-service
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    env_file:
+      - ./observability/tracing-config.env
     ports:
       - "5001:5001"
     environment:
       - SECRET_KEY=poc-secret-key-2024
+      - ORDER_SERVICE_URL=http://order-service:5002
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+    depends_on:
+      - otel-collector
     networks:
       - ecommerce-net
-
   order-service:
-    build: ./order-service
+    build:
+      context: .
+      dockerfile: ./order-service/Dockerfile
+    env_file:
+      - ./observability/tracing-config.env
     ports:
       - "5002:5002"
     environment:
-      - AUTH_SERVICE=http://auth-service:5001
-      - PAYMENT_SERVICE=http://payment-service:5003
-      - NOTIFICATION_SERVICE=http://notification-service:5004
-      - USER_SERVICE=http://user-service:5005
+      - PAYMENT_SERVICE_URL=http://payment-service:5003
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
     depends_on:
       - auth-service
+      - otel-collector
     networks:
       - ecommerce-net
-
   payment-service:
-    build: ./payment-service
+    build:
+      context: .
+      dockerfile: ./payment-service/Dockerfile
+    env_file:
+      - ./observability/tracing-config.env
     ports:
       - "5003:5003"
     environment:
-      - AUTH_SERVICE=http://auth-service:5001
-      - ORDER_SERVICE=http://order-service:5002
-      - NOTIFICATION_SERVICE=http://notification-service:5004
-      - USER_SERVICE=http://user-service:5005
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5004
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
     depends_on:
       - auth-service
+      - otel-collector
     networks:
       - ecommerce-net
-
   notification-service:
-    build: ./notification-service
+    build:
+      context: .
+      dockerfile: ./notification-service/Dockerfile
+    env_file:
+      - ./observability/tracing-config.env
     ports:
       - "5004:5004"
+    environment:
+      - USER_SERVICE_URL=http://user-service:5005
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+    depends_on:
+      - otel-collector
     networks:
       - ecommerce-net
-
   user-service:
-    build: ./user-service
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
+    env_file:
+      - ./observability/tracing-config.env
     ports:
       - "5005:5005"
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+    depends_on:
+      - otel-collector
     networks:
       - ecommerce-net
-
   frontend:
     build: ./frontend
     ports:
@@ -72,11 +103,15 @@ services:
       - ecommerce-net
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    build:
+      context: ./observability
+      dockerfile: Dockerfile.collector
     container_name: otel-collector
-    command: ["--config=/etc/otelcol/config.yaml"]
+    env_file:
+      - ./observability/tracing-config.env
     volumes:
-      - ./observability/otel-collector-config.yaml:/etc/otelcol/config.yaml
+      - ./observability/otel-collector-config.yaml:/etc/otelcol/otel-collector-config.yaml:ro
+      - ./observability/otel-collector-config-tail.yaml:/etc/otelcol/otel-collector-config-tail.yaml:ro
     ports:
       - "4319:4317"
       - "4320:4318"
@@ -86,7 +121,6 @@ services:
     networks:
       - ecommerce-net
     restart: unless-stopped
-
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus

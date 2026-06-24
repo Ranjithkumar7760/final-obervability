@@ -88,3 +88,18 @@ Grafana is configured with automatic datasource and dashboard provisioning. When
 3. **Dashboard 3: Research Dashboard**
    - Compiles request rates, throughput, CPU utilization, memory utilization, and average service response latency trends
 
+## Tracing Sampling Experiments
+
+The Docker Compose tracing strategy is controlled from one file:
+
+```env
+observability/tracing-config.env
+```
+
+Set `TRACING_MODE` to one of `NONE`, `HEAD`, `PROBABILISTIC`, or `TAIL`, then restart the stack:
+
+```bash
+docker compose up -d --build
+```
+
+See `observability/README-tracing-sampling.md` for the full experiment workflow and mode behavior.

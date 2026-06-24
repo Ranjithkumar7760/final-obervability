@@ -29,22 +29,22 @@ If you are using **Minikube** or **Kind** for local development, you should buil
 eval $(minikube docker-env)
 
 # Build the microservices
-docker build -t auth-service:latest ./auth-service
-docker build -t order-service:latest ./order-service
-docker build -t payment-service:latest ./payment-service
-docker build -t notification-service:latest ./notification-service
-docker build -t user-service:latest ./user-service
+docker build -f auth-service/Dockerfile -t auth-service:latest .
+docker build -f order-service/Dockerfile -t order-service:latest .
+docker build -f payment-service/Dockerfile -t payment-service:latest .
+docker build -f notification-service/Dockerfile -t notification-service:latest .
+docker build -f user-service/Dockerfile -t user-service:latest .
 docker build -t frontend:latest ./frontend
 ```
 
 #### For Kind:
 ```bash
 # Build the microservices locally
-docker build -t auth-service:latest ./auth-service
-docker build -t order-service:latest ./order-service
-docker build -t payment-service:latest ./payment-service
-docker build -t notification-service:latest ./notification-service
-docker build -t user-service:latest ./user-service
+docker build -f auth-service/Dockerfile -t auth-service:latest .
+docker build -f order-service/Dockerfile -t order-service:latest .
+docker build -f payment-service/Dockerfile -t payment-service:latest .
+docker build -f notification-service/Dockerfile -t notification-service:latest .
+docker build -f user-service/Dockerfile -t user-service:latest .
 docker build -t frontend:latest ./frontend
 
 # Load images into the Kind cluster
@@ -108,7 +108,7 @@ Create ECR repositories for your services and push the built images:
 aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
 
 # Build and tag your microservices (e.g. auth-service)
-docker build -t auth-service:latest ./auth-service
+docker build -f auth-service/Dockerfile -t auth-service:latest .
 docker tag auth-service:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/auth-service:latest
 
 # Push to your ECR repository

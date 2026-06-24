@@ -2,26 +2,14 @@ import requests
 import uuid
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.flask import FlaskInstrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
 import os
-
-provider = TracerProvider()
-exporter = OTLPSpanExporter(endpoint="http://otel-collector:4317", insecure=True)
-provider.add_span_processor(BatchSpanProcessor(exporter))
-trace.set_tracer_provider(provider)
-tracer = trace.get_tracer("payment-service")
+from shared.otel_config import configure_tracing
 
 app = Flask(__name__)
 CORS(app)
-FlaskInstrumentor().instrument_app(app)
-RequestsInstrumentor().instrument()
+tracer = configure_tracing(app, "payment-service")
 
-NOTIFICATION_SERVICE_URL = os.getenv('NOTIFICATION_SERVICE_URL', 'http://localhost:5003')
+NOTIFICATION_SERVICE_URL = os.getenv('NOTIFICATION_SERVICE_URL', 'http://localhost:5004')
 
 @app.route('/process-payment', methods=['POST'])
 def process_payment():
@@ -49,4 +37,4 @@ def health():
     return jsonify({"status": "healthy", "service": "payment-service"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5002)
+    app.run(host="0.0.0.0", port=5003)

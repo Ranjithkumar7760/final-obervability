@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const AUTH_URL = "http://127.0.0.1:5000";
+const AUTH_URL = "/api/auth";
 
 const PRODUCTS = [
   {
@@ -237,17 +237,17 @@ export default function App() {
 
   // ── Service health checks ──────────────────────────
   const checkServices = async () => {
-    const ports = {
-      auth: 5000,
-      order: 5001,
-      payment: 5002,
-      notification: 5003,
-      user: 5004,
+    const services = {
+      auth: "/api/auth/health",
+      order: "/api/order/health",
+      payment: "/api/payment/health",
+      notification: "/api/notification/health",
+      user: "/api/user/health",
     };
     const ss = {};
-    for (const [name, port] of Object.entries(ports)) {
+    for (const [name, url] of Object.entries(services)) {
       try {
-        const r = await fetch(`http://127.0.0.1:${port}/health`);
+        const r = await fetch(url);
         ss[name] = r.ok ? "up" : "down";
       } catch {
         ss[name] = "down";
@@ -542,15 +542,15 @@ export default function App() {
             {[
               {
                 name: "auth",
-                port: 5000,
+                port: 5001,
                 role: "Validates JWT token",
               },
-              { name: "order", port: 5001, role: "Creates order record" },
-              { name: "payment", port: 5002, role: "Processes payment" },
-              { name: "notification", port: 5003, role: "Sends confirmation" },
+              { name: "order", port: 5002, role: "Creates order record" },
+              { name: "payment", port: 5003, role: "Processes payment" },
+              { name: "notification", port: 5004, role: "Sends confirmation" },
               {
                 name: "user",
-                port: 5004,
+                port: 5005,
                 role: "Updates order history",
               },
             ].map((svc) => (

@@ -2,29 +2,16 @@ import jwt
 import datetime
 import requests
 from flask import Flask, request, jsonify
-from functools import wraps
 import os
 from flask_cors import CORS
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.flask import FlaskInstrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
-
-provider = TracerProvider()
-exporter = OTLPSpanExporter(endpoint="http://otel-collector:4317", insecure=True)
-provider.add_span_processor(BatchSpanProcessor(exporter))
-trace.set_tracer_provider(provider)
-tracer = trace.get_tracer("auth-service")
+from shared.otel_config import configure_tracing
 
 app = Flask(__name__)
 CORS(app)
-FlaskInstrumentor().instrument_app(app)
-RequestsInstrumentor().instrument()
+tracer = configure_tracing(app, "auth-service")
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'poc-secret-key-2024')
-ORDER_SERVICE_URL = os.getenv('ORDER_SERVICE_URL', 'http://localhost:5001')
+ORDER_SERVICE_URL = os.getenv('ORDER_SERVICE_URL', 'http://localhost:5002')
 
 users = {
     'user1': 'pass123',
@@ -82,4 +69,4 @@ def health():
     return jsonify({"status": "healthy", "service": "auth-service"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)

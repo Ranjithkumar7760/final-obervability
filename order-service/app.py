@@ -2,26 +2,14 @@ import requests
 import uuid
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.flask import FlaskInstrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
 import os
-
-provider = TracerProvider()
-exporter = OTLPSpanExporter(endpoint="http://otel-collector:4317", insecure=True)
-provider.add_span_processor(BatchSpanProcessor(exporter))
-trace.set_tracer_provider(provider)
-tracer = trace.get_tracer("order-service")
+from shared.otel_config import configure_tracing
 
 app = Flask(__name__)
 CORS(app)
-FlaskInstrumentor().instrument_app(app)
-RequestsInstrumentor().instrument()
+tracer = configure_tracing(app, "order-service")
 
-PAYMENT_SERVICE_URL = os.getenv('PAYMENT_SERVICE_URL', 'http://localhost:5002')
+PAYMENT_SERVICE_URL = os.getenv('PAYMENT_SERVICE_URL', 'http://localhost:5003')
 
 @app.route('/create-order', methods=['POST'])
 def create_order():
@@ -50,4 +38,4 @@ def health():
     return jsonify({"status": "healthy", "service": "order-service"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5002)
