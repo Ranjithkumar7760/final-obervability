@@ -12,6 +12,16 @@ Change only `TRACING_MODE`:
 TRACING_MODE=HEAD
 ```
 
+For Kubernetes/EKS, sync the env file into Kubernetes manifests and optionally deploy it:
+
+```powershell
+# Regenerate kubernetes/tracing-config.yaml and kubernetes/otel-collector-config.yaml
+powershell -ExecutionPolicy Bypass -File scripts/sync-tracing-mode.ps1
+
+# Regenerate, apply to the cluster, and restart tracing-aware deployments
+powershell -ExecutionPolicy Bypass -File scripts/sync-tracing-mode.ps1 -Apply
+```
+
 Supported values:
 
 | Mode | Behavior |
@@ -22,6 +32,8 @@ Supported values:
 | `TAIL` | Services export 100% of traces to the OpenTelemetry Collector. The collector applies tail sampling and keeps traces with `ERROR` status. |
 
 ## Run An Experiment
+
+### Docker Compose
 
 1. Edit `observability/tracing-config.env`.
 2. Start or recreate the stack:
@@ -41,6 +53,15 @@ If Docker Compose does not recreate containers after only changing the env file,
 
 ```bash
 docker compose up -d --build --force-recreate
+```
+
+### Kubernetes/EKS
+
+1. Edit `observability/tracing-config.env`.
+2. Run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/sync-tracing-mode.ps1 -Apply
 ```
 
 ## Mode Examples

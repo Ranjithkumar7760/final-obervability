@@ -27,6 +27,7 @@ metadata:
   name: jaeger
   namespace: ecommerce-poc
 spec:
+  type: NodePort
   selector:
     app: jaeger
   ports:
@@ -34,6 +35,7 @@ spec:
       protocol: TCP
       port: 16686
       targetPort: 16686
+      nodePort: 31686
     - name: otlp-grpc
       protocol: TCP
       port: 4317

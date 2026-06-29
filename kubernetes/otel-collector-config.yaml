@@ -12,7 +12,7 @@ data:
             endpoint: 0.0.0.0:4317
           http:
             endpoint: 0.0.0.0:4318
-
+    
     exporters:
       debug:
       otlp/jaeger:
@@ -22,7 +22,7 @@ data:
       prometheus:
         endpoint: 0.0.0.0:8889
         namespace: "otel"
-
+    
     connectors:
       spanmetrics:
         histogram:
@@ -33,10 +33,10 @@ data:
           - name: http.status_code
           - name: http.method
           - name: http.route
-
+    
     processors:
       batch:
-
+    
     service:
       pipelines:
         traces:

@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: auth-service:latest
-          imagePullPolicy: IfNotPresent
+          image: 262439760574.dkr.ecr.eu-west-1.amazonaws.com/auth-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5001
           env:
@@ -33,6 +33,11 @@ spec:
               value: "http://otel-collector:4317"
             - name: OTEL_EXPORTER_OTLP_INSECURE
               value: "true"
+            - name: TRACING_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: TRACING_MODE
 ---
 apiVersion: v1
 kind: Service
@@ -64,8 +69,8 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: order-service:latest
-          imagePullPolicy: IfNotPresent
+          image: 262439760574.dkr.ecr.eu-west-1.amazonaws.com/order-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5002
           env:
@@ -75,6 +80,11 @@ spec:
               value: "http://otel-collector:4317"
             - name: OTEL_EXPORTER_OTLP_INSECURE
               value: "true"
+            - name: TRACING_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: TRACING_MODE
 ---
 apiVersion: v1
 kind: Service
@@ -106,8 +116,8 @@ spec:
     spec:
       containers:
         - name: payment-service
-          image: payment-service:latest
-          imagePullPolicy: IfNotPresent
+          image: 262439760574.dkr.ecr.eu-west-1.amazonaws.com/payment-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5003
           env:
@@ -117,6 +127,11 @@ spec:
               value: "http://otel-collector:4317"
             - name: OTEL_EXPORTER_OTLP_INSECURE
               value: "true"
+            - name: TRACING_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: TRACING_MODE
 ---
 apiVersion: v1
 kind: Service
@@ -148,8 +163,8 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: notification-service:latest
-          imagePullPolicy: IfNotPresent
+          image: 262439760574.dkr.ecr.eu-west-1.amazonaws.com/notification-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5004
           env:
@@ -159,6 +174,11 @@ spec:
               value: "http://otel-collector:4317"
             - name: OTEL_EXPORTER_OTLP_INSECURE
               value: "true"
+            - name: TRACING_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: TRACING_MODE
 ---
 apiVersion: v1
 kind: Service
@@ -190,8 +210,8 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: user-service:latest
-          imagePullPolicy: IfNotPresent
+          image: 262439760574.dkr.ecr.eu-west-1.amazonaws.com/user-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5005
           env:
@@ -199,6 +219,11 @@ spec:
               value: "http://otel-collector:4317"
             - name: OTEL_EXPORTER_OTLP_INSECURE
               value: "true"
+            - name: TRACING_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: TRACING_MODE
 ---
 apiVersion: v1
 kind: Service
@@ -230,8 +255,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: frontend:latest
-          imagePullPolicy: IfNotPresent
+          image: 262439760574.dkr.ecr.eu-west-1.amazonaws.com/frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
 ---
