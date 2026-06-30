@@ -141,4 +141,4 @@ Jaeger:
 http://<node-ip>:31686
 ```
 
-In `TAIL` sampling mode, successful traces appear as a sample, while error traces are always kept. Metrics dashboards should still show request rate and resource usage.
+In `PROBABILISTIC` sampling mode, Jaeger should show roughly 10% of successful traces after enough traffic. In `TAIL` sampling mode, successful traces are sampled at 50%, while error traces are always kept. Metrics dashboards should still show request rate and resource usage.

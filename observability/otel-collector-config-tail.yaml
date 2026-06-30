@@ -41,7 +41,7 @@ processors:
       - name: successful-trace-sample
         type: probabilistic
         probabilistic:
-          sampling_percentage: 20
+          sampling_percentage: 50
   batch:
 
 service:

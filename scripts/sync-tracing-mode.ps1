@@ -24,6 +24,13 @@ if ($validModes -notcontains $mode) {
   throw "Invalid TRACING_MODE=$mode. Use one of: $($validModes -join ', ')"
 }
 
+$sampleRateLine = Get-Content $envFile | Where-Object { $_ -match '^\s*OTEL_TRACES_SAMPLER_ARG\s*=' } | Select-Object -First 1
+$sampleRate = if ($sampleRateLine) {
+  (($sampleRateLine -split '=', 2)[1]).Trim().Trim('"').Trim("'")
+} else {
+  "0.1"
+}
+
 $collectorSource = if ($mode -eq "TAIL") {
   Join-Path $repoRoot "observability/otel-collector-config-tail.yaml"
 } else {
@@ -42,6 +49,7 @@ metadata:
   namespace: ecommerce-poc
 data:
   TRACING_MODE: "$mode"
+  OTEL_TRACES_SAMPLER_ARG: "$sampleRate"
 "@
 
 Set-Content -Path $kubeTracingConfig -Value $tracingConfigContent -Encoding ascii

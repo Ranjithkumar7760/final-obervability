@@ -38,6 +38,11 @@ spec:
                 configMapKeyRef:
                   name: tracing-config
                   key: TRACING_MODE
+            - name: OTEL_TRACES_SAMPLER_ARG
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: OTEL_TRACES_SAMPLER_ARG
 ---
 apiVersion: v1
 kind: Service
@@ -85,6 +90,11 @@ spec:
                 configMapKeyRef:
                   name: tracing-config
                   key: TRACING_MODE
+            - name: OTEL_TRACES_SAMPLER_ARG
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: OTEL_TRACES_SAMPLER_ARG
 ---
 apiVersion: v1
 kind: Service
@@ -132,6 +142,11 @@ spec:
                 configMapKeyRef:
                   name: tracing-config
                   key: TRACING_MODE
+            - name: OTEL_TRACES_SAMPLER_ARG
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: OTEL_TRACES_SAMPLER_ARG
 ---
 apiVersion: v1
 kind: Service
@@ -179,6 +194,11 @@ spec:
                 configMapKeyRef:
                   name: tracing-config
                   key: TRACING_MODE
+            - name: OTEL_TRACES_SAMPLER_ARG
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: OTEL_TRACES_SAMPLER_ARG
 ---
 apiVersion: v1
 kind: Service
@@ -224,6 +244,11 @@ spec:
                 configMapKeyRef:
                   name: tracing-config
                   key: TRACING_MODE
+            - name: OTEL_TRACES_SAMPLER_ARG
+              valueFrom:
+                configMapKeyRef:
+                  name: tracing-config
+                  key: OTEL_TRACES_SAMPLER_ARG
 ---
 apiVersion: v1
 kind: Service

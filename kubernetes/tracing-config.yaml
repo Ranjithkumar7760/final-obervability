@@ -5,3 +5,4 @@ metadata:
   namespace: ecommerce-poc
 data:
   TRACING_MODE: "TAIL"
+  OTEL_TRACES_SAMPLER_ARG: "0.1"
