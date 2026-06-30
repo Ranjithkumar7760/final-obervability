@@ -38,6 +38,10 @@ processors:
         status_code:
           status_codes:
             - ERROR
+      - name: successful-trace-sample
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: 20
   batch:
 
 service:

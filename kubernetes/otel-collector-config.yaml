@@ -35,14 +35,32 @@ data:
           - name: http.route
     
     processors:
+      tail_sampling:
+        decision_wait: 5s
+        num_traces: 100
+        expected_new_traces_per_sec: 50
+        policies:
+          - name: errors
+            type: status_code
+            status_code:
+              status_codes:
+                - ERROR
+          - name: successful-trace-sample
+            type: probabilistic
+            probabilistic:
+              sampling_percentage: 20
       batch:
     
     service:
       pipelines:
-        traces:
+        traces/spanmetrics:
           receivers: [otlp]
           processors: [batch]
-          exporters: [otlp/jaeger, spanmetrics]
+          exporters: [spanmetrics]
+        traces/tail:
+          receivers: [otlp]
+          processors: [tail_sampling, batch]
+          exporters: [otlp/jaeger]
         metrics:
           receivers: [otlp, spanmetrics]
           processors: [batch]

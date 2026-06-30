@@ -4,4 +4,4 @@ metadata:
   name: tracing-config
   namespace: ecommerce-poc
 data:
-  TRACING_MODE: "PROBABILISTIC"
+  TRACING_MODE: "TAIL"

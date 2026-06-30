@@ -141,4 +141,4 @@ Jaeger:
 http://<node-ip>:31686
 ```
 
-In `TAIL` sampling mode, successful traces may not appear in Jaeger because the current tail policy keeps error traces. Metrics dashboards should still show request rate and resource usage.
+In `TAIL` sampling mode, successful traces appear as a sample, while error traces are always kept. Metrics dashboards should still show request rate and resource usage.

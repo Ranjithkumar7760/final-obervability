@@ -29,7 +29,7 @@ Supported values:
 | `NONE` | Disables OpenTelemetry instrumentation in the Flask services. The app still works, but no new traces are exported. |
 | `HEAD` | Uses 100% head sampling in every Flask service. This is equivalent to `OTEL_TRACES_SAMPLER=always_on`. |
 | `PROBABILISTIC` | Uses 10% trace ID ratio sampling in every Flask service. This is equivalent to `OTEL_TRACES_SAMPLER=traceidratio` and `OTEL_TRACES_SAMPLER_ARG=0.1`. |
-| `TAIL` | Services export 100% of traces to the OpenTelemetry Collector. The collector applies tail sampling and keeps traces with `ERROR` status. |
+| `TAIL` | Services export 100% of traces to the OpenTelemetry Collector. The collector applies tail sampling, keeps all traces with `ERROR` status, and keeps a 20% sample of successful traces. |
 
 ## Run An Experiment
 
@@ -95,5 +95,5 @@ The `TAIL` mode uses `observability/otel-collector-config-tail.yaml`, selected a
 ## Notes For Measurement
 
 - Clear old Jaeger traces between experiment modes by recreating the stack.
-- In `TAIL` mode, successful traces are not expected to appear unless they contain an `ERROR` status, because the configured policy keeps only error traces.
+- In `TAIL` mode, successful traces appear as a sample, while error traces are always kept by the collector policy.
 - Use k6 or the existing traffic generator to produce identical workloads for each mode.
